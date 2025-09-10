@@ -8,7 +8,7 @@ defined('MYAAC') or die('Direct access not allowed!');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo config('server_name'); ?> - Home</title>
-    <link rel="stylesheet" href="<?php echo $template_path; ?>/style.css">
+    <link rel="stylesheet" href="<?php echo $template_path; ?>./css/output.css">
     <?php echo template_place_holder('head_end'); ?>
 </head>
 
@@ -103,4 +103,6 @@ defined('MYAAC') or die('Direct access not allowed!');
 </header>
 
  <?php echo $content; ?>
+
+ <h1 class="underline text-blue-600">gregregregregregre</h1>
 </body>
