@@ -1,0 +1,2 @@
+[Tue, 09 Sep 2025 04:27:19 +0200] [OTS_MonstersList.php] Fatal error: Cannot load monsters.xml. File does not exist. (/home/amajo/canary/data/monster/monsters.xml).
+[Tue, 09 Sep 2025 04:27:19 +0200] [OTS_SpellsList.php] Fatal error: Cannot load spells.xml. File does not exist. (/home/amajo/canary/data/spells/spells.xml).
