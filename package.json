@@ -17,9 +17,5 @@
   "bugs": {
     "url": "https://github.com/Amayio/chronicles_template/issues"
   },
-  "homepage": "https://github.com/Amayio/chronicles_template#readme",
-  "dependencies": {
-    "@tailwindcss/cli": "^4.1.13",
-    "tailwindcss": "^4.1.13"
-  }
+  "homepage": "https://github.com/Amayio/chronicles_template#readme"
 }

@@ -15,168 +15,161 @@ use MyAAC\Models\Player;
 
 defined('MYAAC') or die('Direct access not allowed!');
 
-$status = array();
-$status['online'] = false;
-$status['players'] = 0;
-$status['playersMax'] = 0;
-$status['lastCheck'] = 0;
-$status['uptime'] = '0h 0m';
-$status['monsters'] = 0;
+$status = [
+    'online' => false,
+    'players' => 0,
+    'playersMax' => 0,
+    'lastCheck' => 0,
+    'uptime' => '0h 0m',
+    'monsters' => 0
+];
 
-if(setting('core.status_enabled') === false) {
-	return;
+if (setting('core.status_enabled') === false) {
+    return;
 }
 
-/**
- * @var array $config
- */
+/** @var array $config */
 $status_ip = $config['lua']['ip'];
-if(isset($config['lua']['statusProtocolPort'])) {
-	$config['lua']['loginPort'] = $config['lua']['statusProtocolPort'];
-	$config['lua']['statusPort'] = $config['lua']['statusProtocolPort'];
-	$status_port = $config['lua']['statusProtocolPort'];
-}
-else if(isset($config['lua']['status_port'])) {
-	$config['lua']['loginPort'] = $config['lua']['status_port'];
-	$config['lua']['statusPort'] = $config['lua']['status_port'];
-	$status_port = $config['lua']['status_port'];
+
+if (isset($config['lua']['statusProtocolPort'])) {
+    $config['lua']['loginPort'] = $config['lua']['statusProtocolPort'];
+    $config['lua']['statusPort'] = $config['lua']['statusProtocolPort'];
+    $status_port = $config['lua']['statusProtocolPort'];
+} elseif (isset($config['lua']['status_port'])) {
+    $config['lua']['loginPort'] = $config['lua']['status_port'];
+    $config['lua']['statusPort'] = $config['lua']['status_port'];
+    $status_port = $config['lua']['status_port'];
 }
 
-// ip check
+// IP check
 $settingIP = setting('core.status_ip');
-if(isset($settingIP[0]))
-{
-	$status_ip = $settingIP;
-}
-elseif(!isset($status_ip[0])) // try localhost if no ip specified
-{
-	$status_ip = '127.0.0.1';
+if (!empty($settingIP)) {
+    $status_ip = $settingIP;
+} elseif (empty($status_ip)) {
+    $status_ip = '127.0.0.1'; // fallback to localhost
 }
 
-// port check
+// Port check
 $status_port = $config['lua']['statusPort'];
 $settingPort = setting('core.status_port');
-if(isset($settingPort[0])) {
-	$status_port = $settingPort;
-}
-elseif(!isset($status_port[0])) // try 7171 if no port specified
-{
-	$status_port = 7171;
+if (!empty($settingPort)) {
+    $status_port = $settingPort;
+} elseif (empty($status_port)) {
+    $status_port = 7171; // fallback
 }
 
 $fetch_from_db = true;
-/**
- * @var Cache $cache
- */
-if($cache->enabled())
-{
-	$tmp = '';
-	if($cache->fetch('status', $tmp))
-	{
-		$status = unserialize($tmp);
-		$fetch_from_db = false;
-	}
+
+/** @var Cache $cache */
+if ($cache->enabled()) {
+    $tmp = '';
+    if ($cache->fetch('status', $tmp)) {
+        $status = unserialize($tmp);
+        $fetch_from_db = false;
+    }
 }
 
-if($fetch_from_db)
-{
-	$status_query = Config::where('name', 'LIKE', '%status%')->get();
-	if (!$status_query || !$status_query->count()) {
-		foreach($status as $key => $value) {
-			registerDatabaseConfig('status_' . $key, $value);
-		}
-	} else {
-		foreach($status_query as $tmp) {
-			$status[str_replace('status_', '', $tmp->name)] = $tmp->value;
-		}
-	}
+if ($fetch_from_db) {
+    $status_query = Config::where('name', 'LIKE', '%status%')->get();
+    if (!$status_query || !$status_query->count()) {
+        foreach ($status as $key => $value) {
+            registerDatabaseConfig('status_' . $key, $value);
+        }
+    } else {
+        foreach ($status_query as $tmp) {
+            $status[str_replace('status_', '', $tmp->name)] = $tmp->value;
+        }
+    }
 }
 
-if(isset($config['lua']['statustimeout']))
-	$config['lua']['statusTimeout'] = $config['lua']['statustimeout'];
+if (isset($config['lua']['statustimeout'])) {
+    $config['lua']['statusTimeout'] = $config['lua']['statustimeout'];
+}
 
-// get status timeout from server config
+// Get status timeout from server config
 $status_timeout = eval('return ' . $config['lua']['statusTimeout'] . ';') / 1000 + 1;
 $status_interval = setting('core.status_interval');
-if($status_interval && $status_timeout < $status_interval) {
-	$status_timeout = $status_interval;
+if ($status_interval && $status_timeout < $status_interval) {
+    $status_timeout = $status_interval;
 }
 
-/**
- * @var int $status_timeout
- */
-if($status['lastCheck'] + $status_timeout < time()) {
-	updateStatus();
+if ($status['lastCheck'] + $status_timeout < time()) {
+    updateStatus();
 }
 
 function updateStatus() {
-	global $db, $cache, $config, $status, $status_ip, $status_port;
+    global $db, $cache, $config, $status, $status_ip, $status_port;
 
-	// get server status and save it to database
-	$serverInfo = new OTS_ServerInfo($status_ip, $status_port);
-	$serverInfo->setTimeout(setting('core.status_timeout'));
+    $serverInfo = new OTS_ServerInfo($status_ip, $status_port);
+    $serverInfo->setTimeout(setting('core.status_timeout'));
 
-	$serverStatus = $serverInfo->status();
-	if(!$serverStatus)
-	{
-		$status['online'] = false;
-		$status['players'] = 0;
-		$status['playersMax'] = 0;
-	}
-	else
-	{
-		$status['lastCheck'] = time(); // this should be set only if server respond
+    $serverStatus = $serverInfo->status();
 
-		$status['online'] = true;
-		$status['players'] = $serverStatus->getOnlinePlayers(); // counts all players logged in-game, or only connected clients (if enabled on server side)
-		$status['playersMax'] = $serverStatus->getMaxPlayers();
+    if (!$serverStatus) {
+        $status['online'] = false;
+        $status['players'] = 0;
+        $status['playersMax'] = 0;
+    } else {
+        $status['lastCheck'] = time();
+        $status['online'] = true;
+        $status['players'] = $serverStatus->getOnlinePlayers();
+        $status['playersMax'] = $serverStatus->getMaxPlayers();
 
-		// for status afk thing
-		if (setting('core.online_afk'))
-		{
-			$status['playersTotal'] = 0;
-			// get amount of players that are currently logged in-game, including disconnected clients (exited)
-			if($db->hasTable('players_online')) { // tfs 1.x
-				$status['playersTotal'] = PlayerOnline::count();
-			}
-			else {
-				$status['playersTotal'] = Player::online()->count();
-			}
-		}
+        // Handle total players (incl. AFK)
+        if (setting('core.online_afk')) {
+            $status['playersTotal'] = 0;
+            if ($db->hasTable('players_online')) {
+                $status['playersTotal'] = PlayerOnline::count();
+            } else {
+                $status['playersTotal'] = Player::online()->count();
+            }
+        }
 
-		$uptime = $status['uptime'] = $serverStatus->getUptime();
-		$m = date('m', $uptime);
-		$m = $m > 1 ? "$m months, " : ($m == 1 ? 'month, ' : '');
-		$d = date('d', $uptime);
-		$d = $d > 1 ? "$d days, " : ($d == 1 ? 'day, ' : '');
-		$h = date('H', $uptime);
-		$min = date('i', $uptime);
-		$status['uptimeReadable'] = "{$m}{$d}{$h}h {$min}m";
+        // Format uptime
+        $uptimeSeconds = $status['uptime'] = $serverStatus->getUptime();
 
-		$status['monsters'] = $serverStatus->getMonstersCount();
-		$status['motd'] = $serverStatus->getMOTD();
+        $months  = floor($uptimeSeconds / (30 * 24 * 60 * 60));
+        $days    = floor(($uptimeSeconds % (30 * 24 * 60 * 60)) / (24 * 60 * 60));
+        $hours   = floor(($uptimeSeconds % (24 * 60 * 60)) / (60 * 60));
+        $minutes = floor(($uptimeSeconds % (60 * 60)) / 60);
 
-		$status['mapAuthor'] = $serverStatus->getMapAuthor();
-		$status['mapName'] = $serverStatus->getMapName();
-		$status['mapWidth'] = $serverStatus->getMapWidth();
-		$status['mapHeight'] = $serverStatus->getMapHeight();
+        $uptimeStr = '';
 
-		$status['server'] = $serverStatus->getServer();
-		$status['serverVersion'] = $serverStatus->getServerVersion();
-		$status['clientVersion'] = $serverStatus->getClientVersion();
-	}
+        if ($months > 0) {
+            $uptimeStr .= $months . ($months > 1 ? ' months, ' : ' month, ');
+        }
 
-	if($cache->enabled()) {
-		$cache->set('status', serialize($status), 120);
-	}
+        if ($days > 0) {
+            $uptimeStr .= $days . ($days > 1 ? ' days, ' : ' day, ');
+        }
 
-	$tmpVal = null;
-	foreach($status as $key => $value) {
-		if(fetchDatabaseConfig('status_' . $key, $tmpVal)) {
-			updateDatabaseConfig('status_' . $key, $value);
-		}
-		else {
-			registerDatabaseConfig('status_' . $key, $value);
-		}
-	}
+        $uptimeStr .= "{$hours}h {$minutes}m";
+        $status['uptimeReadable'] = $uptimeStr;
+
+        // Other info
+        $status['monsters'] = $serverStatus->getMonstersCount();
+        $status['motd'] = $serverStatus->getMOTD();
+
+        $status['mapAuthor'] = $serverStatus->getMapAuthor();
+        $status['mapName'] = $serverStatus->getMapName();
+        $status['mapWidth'] = $serverStatus->getMapWidth();
+        $status['mapHeight'] = $serverStatus->getMapHeight();
+
+        $status['server'] = $serverStatus->getServer();
+        $status['serverVersion'] = $serverStatus->getServerVersion();
+        $status['clientVersion'] = $serverStatus->getClientVersion();
+    }
+
+    if ($cache->enabled()) {
+        $cache->set('status', serialize($status), 120);
+    }
+
+    $tmpVal = null;
+    foreach ($status as $key => $value) {
+        if (fetchDatabaseConfig('status_' . $key, $tmpVal)) {
+            updateDatabaseConfig('status_' . $key, $value);
+        } else {
+            registerDatabaseConfig('status_' . $key, $value);
+        }
+    }
 }

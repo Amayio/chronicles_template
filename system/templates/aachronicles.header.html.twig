@@ -1,0 +1,86 @@
+<header class="header">
+  <div class="header__wrapper">
+    
+    <div class="logo__container">
+      <a href="#">
+        <img width="80px" src="{{ template_path }}/images/logo.png" alt="Logo" class="logo">
+      </a>
+    </div>
+
+    <nav class="nav">
+
+      <div class="nav__dropdown">
+        <button class="nav__item nav__dropdown-toggle" aria-expanded="false">
+          Game Guide
+          <svg class="nav__dropdown-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+
+        <div class="nav__dropdown-content">
+          <div class="nav__dropdown-category">
+            <h4>Server</h4>
+            <ul class="nav__link-grid">
+              <li><a href="#">Highscores</a></li>
+              <li><a href="#">Characters</a></li>
+              <li><a href="#">Who is Online?</a></li>
+              <li><a href="#">Last Kills</a></li>
+              <li><a href="#">Houses</a></li>
+              <li><a href="#">Guilds</a></li>
+            </ul>
+          </div>
+          <div class="nav__dropdown-category">
+            <h4>Game</h4>
+            <ul class="nav__link-grid">
+              <li><a href="#">World Map</a></li>
+              <li><a href="#">Shinobi Roster</a></li>
+              <li><a href="#">Bestiary</a></li>
+              <li><a href="#">Shinobi Gear</a></li>
+              <li><a href="#">Tutorials</a></li>
+              <li><a href="#">Systems</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <a class="nav__item" href="{{ getLink('downloads') }}">Download</a>
+      <a class="nav__item" href="{{ getLink('points') }}">Premium</a>
+
+      {% if logged %}
+        <a class="nav__item" href="{{ getLink('account/manage') }}">Manage Account</a>
+        <a class="nav__item" href="{{ getLink('account/logout') }}">Log out</a>
+      {% else %}
+        <a class="nav__item" href="{{ getLink('account/create') }}">Create Account</a>
+        <a class="nav__item" href="{{ getLink('account/manage') }}">Log in</a>
+      {% endif %}
+    </nav>
+
+    <div class="header__server-status">
+      <p class="header__server-status-label header__server-status-title">Server Status</p>
+
+      {% if status.online != true %}
+        <p class="header__server-status-info">
+          Status: <span class="header__server-status-offline">Offline</span>
+        </p>
+      {% else %}
+        <p class="header__server-status-info">
+          Status: <span class="header__server-status-online">Online</span>
+        </p>
+        <p class="header__server-status-info players_online">
+          <span class="header__server-status-label">Players Online:</span>
+          {{ status.players }} / {{ status.playersMax }}
+        </p>
+        <p class="header__server-status-info uptime">
+          <span class="header__server-status-label">Uptime:</span> {{ status.uptimeReadable }}
+        </p>
+      {% endif %}
+    </div>
+
+    <button class="hamburger hamburger--elastic" type="button">
+      <span class="hamburger-box">
+        <span class="hamburger-inner"></span>
+      </span>
+    </button>
+
+  </div>
+</header>
