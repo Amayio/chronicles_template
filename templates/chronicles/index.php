@@ -5,13 +5,14 @@ $page = defined('PAGE') ? PAGE : 'home';
 
 $standalone_pages = [
     'account/create'            => 'register.php',
-    'account/manage'            => 'manageAcc.php',
-    'account/change-email'      => 'manageAcc.php',
-    'account/register'          => 'manageAcc.php',
-    'account/change-info'       => 'manageAcc.php',
-    'account/characters/create' => 'manageAcc.php',
-    'account/characters/delete' => 'manageAcc.php',
-    'points'                    => 'shop.php',
+    // 'account/manage'            => 'manageAcc.php',
+    // 'account/change-email'      => 'manageAcc.php',
+    // 'account/register'          => 'manageAcc.php',
+    // 'account/change-info'       => 'manageAcc.php',
+    // 'account/characters/create' => 'manageAcc.php',
+    // 'account/characters/delete' => 'manageAcc.php',
+    // 'points'                    => 'shop.php',
+    'items'                      => 'items.php'
 ];
 
 if (isset($standalone_pages[$page])) {

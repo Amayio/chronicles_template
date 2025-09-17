@@ -354,8 +354,8 @@ if(setting('core.account_country_recognize')) {
 	}
 }
 
-if(!empty($errors))
-	$twig->display('error_box.html.twig', array('errors' => $errors));
+// if(!empty($errors))
+// 	$twig->display('error_box.html.twig', array('errors' => $errors));
 
 if (setting('core.account_country')) {
 	$countries = array();
