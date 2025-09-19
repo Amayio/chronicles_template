@@ -315,13 +315,6 @@ if (!$found) {
 
 define('PAGE', $page);
 
-// inicjalizacja Twig (jeśli nie jest globalna)
-// if (!isset($twig)) {
-//     /** @var Twig\Environment $twig */
-//     require SYSTEM . 'init_twig.php';
-//     $GLOBALS['twig'] = $twig;
-// }
-
 $standalone_pages = [
     'highscores' => SYSTEM . 'pages/highscores.php',
 	'highscores/experience' => SYSTEM . 'pages/highscores.php',

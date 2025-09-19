@@ -1,26 +1,6 @@
 <?php
 defined('MYAAC') or die('Direct access not allowed!');
 
-$page = defined('PAGE') ? PAGE : 'home';
-
-$standalone_pages = [
-    'account/create'            => 'register.php',
-    'account/manage'            => 'manageAcc.php',
-    // 'account/change-email'      => 'manageAcc.php',
-    // 'account/register'          => 'manageAcc.php',
-    // 'account/change-info'       => 'manageAcc.php',
-    // 'account/characters/create' => 'manageAcc.php',
-    // 'account/characters/delete' => 'manageAcc.php',
-    // 'points'                    => 'shop.php',
-    // 'highscores'                      => 'highscore.php'
-];
-
-if (isset($standalone_pages[$page])) {
-    include __DIR__ . '/pages/' . $standalone_pages[$page];
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html class="scroll-lock" lang="en">
 <head>
