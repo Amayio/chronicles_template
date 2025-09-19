@@ -303,12 +303,16 @@ if(setting('core.highscores_frags')) {
 if(setting('core.highscores_balance'))
 	$types['balance'] = 'Balance';
 
+
+$content = '';
 if ($highscoresTTL > 0 && $cache->enabled()) {
-	echo '<small>*Note: Highscores are updated every' . ($highscoresTTL > 1 ? ' ' . $highscoresTTL : '') . ' minute' . ($highscoresTTL > 1 ? 's' : '') . '.</small><br/><br/>';
+	$content .= '<small>*Note: Highscores are updated every' . ($highscoresTTL > 1 ? ' ' . $highscoresTTL : '') . ' minute' . ($highscoresTTL > 1 ? 's' : '') . '.</small><br/><br/>';
 }
 
+$twig = $GLOBALS['twig'];
+
 /** @var Twig\Environment $twig */
-$twig->display('highscores.html.twig', [
+$content = $twig->render('highscores.html.twig', [
 	'highscores' => $highscores,
 	'list' => $list,
 	'skill' => $skill,
@@ -324,3 +328,5 @@ $twig->display('highscores.html.twig', [
 	'baseLink' => $baseLink,
 	'updatedAt' => $updatedAt,
 ]);
+
+echo $content;

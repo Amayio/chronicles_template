@@ -315,25 +315,31 @@ if (!$found) {
 
 define('PAGE', $page);
 
-ob_start();
-if($hooks->trigger(HOOK_BEFORE_PAGE)) {
-	if(!$ignore && $file !== false)
-		require $file;
+// inicjalizacja Twig (jeśli nie jest globalna)
+// if (!isset($twig)) {
+//     /** @var Twig\Environment $twig */
+//     require SYSTEM . 'init_twig.php';
+//     $GLOBALS['twig'] = $twig;
+// }
+
+$standalone_pages = [
+    'highscores' => SYSTEM . 'pages/highscores.php',
+	'highscores/experience' => SYSTEM . 'pages/highscores.php',
+    'account/create' => SYSTEM . 'pages/account/create.php',
+];
+
+if (isset($standalone_pages[$page]) && file_exists($standalone_pages[$page])) {
+    require $standalone_pages[$page]; 
+    exit;
 }
 
-unset($file);
+if ($hooks->trigger(HOOK_BEFORE_PAGE)) {
+    if (!$ignore && $file !== false && file_exists($file)) {
+        require $file; 
+    }
+}
 
-if(setting('core.backward_support') && isset($main_content[0]))
-	$content .= $main_content;
-
-$content .= ob_get_contents();
-ob_end_clean();
 $hooks->trigger(HOOK_AFTER_PAGE);
-
-if (isset($_REQUEST['_page_only'])) {
-	echo $content;
-	die;
-}
 
 if(!isset($title)) {
 	$title = str_replace('index.php/', '', $page);

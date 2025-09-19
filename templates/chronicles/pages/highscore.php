@@ -17,12 +17,11 @@ defined('MYAAC') or die('Direct access not allowed!');
  <?php echo chronicles_header(); ?>
 
 
-    <main class="register_main">
+   
         
-            <?php echo $content; ?>
+           <?php echo $content; ?>.
        
-    </main>
-
+    
      <?php echo chronicles_footer(); ?>
 </body>
 </html>

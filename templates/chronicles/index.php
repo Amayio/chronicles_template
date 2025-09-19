@@ -5,14 +5,14 @@ $page = defined('PAGE') ? PAGE : 'home';
 
 $standalone_pages = [
     'account/create'            => 'register.php',
-    // 'account/manage'            => 'manageAcc.php',
+    'account/manage'            => 'manageAcc.php',
     // 'account/change-email'      => 'manageAcc.php',
     // 'account/register'          => 'manageAcc.php',
     // 'account/change-info'       => 'manageAcc.php',
     // 'account/characters/create' => 'manageAcc.php',
     // 'account/characters/delete' => 'manageAcc.php',
     // 'points'                    => 'shop.php',
-    'items'                      => 'items.php'
+    // 'highscores'                      => 'highscore.php'
 ];
 
 if (isset($standalone_pages[$page])) {
@@ -29,6 +29,7 @@ if (isset($standalone_pages[$page])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo config('server_name'); ?> - Home</title>
     <link rel="stylesheet" href="<?php echo $template_path; ?>/css/style.css">
+    <script type="module" src="<?php echo $template_path; ?>/js/headerNav.js"></script>
     <?php echo template_place_holder('head_end'); ?>
 </head>
 
@@ -59,7 +60,7 @@ if (isset($standalone_pages[$page])) {
 </section>
 
 </main>
-
+<?php echo $content; ?>.
 
  <?php echo chronicles_footer(); ?>
 

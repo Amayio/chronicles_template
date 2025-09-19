@@ -19,4 +19,6 @@ if(!$logged) {
 
 require SYSTEM . 'logout.php';
 
-$twig->display('account.logout.html.twig');
+
+header('Location: ' . getLink('account/manage'));
+exit;
